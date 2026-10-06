@@ -160,7 +160,14 @@ def load_and_consolidate_datasets():
         {'municipio': 'Laranjal do Jari', 'marcio': 22, 'liliane': 0, 'acácio': 70},
         {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38, 'acácio': 3479},
         {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26, 'acácio': 1545},
-        {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545}
+        {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545},
+        {'municipio': 'Calçoene', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Cutias', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Ferreira Gomes', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Pedra Branca do Amapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Serra do Navio', 'marcio': 0, 'liliane': 0, 'acácio': 0}
     ]
 
     df_da = pd.DataFrame(dados_analise_raw)
@@ -241,6 +248,63 @@ with k3:
 
 st.markdown("---")
 
+# NEW: Camada de Geolocalização Integrada Nativa (Coordenadas do Amapá)
+st.subheader("🗺️ Mapeamento Espacial das Urnas e Clientes Mapeados")
+
+# Dicionário de geolocalização dos municípios do Amapá para plotagem
+geo_data = {
+    'macapá': {'lat': -0.0349, 'lon': -51.0694},
+    'santana': {'lat': -0.0583, 'lon': -51.1817},
+    'itaubal': {'lat': 0.6031, 'lon': -50.6975},
+    'mazagão': {'lat': -0.1156, 'lon': -51.2894},
+    'tartarugalzinho': {'lat': 1.5058, 'lon': -50.9125},
+    'portogrande': {'lat': 0.7128, 'lon': -51.4131},
+    'amapá': {'lat': 2.0539, 'lon': -50.7967},
+    'calçoene': {'lat': 2.5025, 'lon': -50.9506},
+    'cutias': {'lat': 0.8686, 'lon': -50.8017},
+    'ferreiragomes': {'lat': 0.8578, 'lon': -51.1822},
+    'laranjaldojari': {'lat': -0.8422, 'lon': -52.5161},
+    'oiapoque': {'lat': 3.8425, 'lon': -51.8353},
+    'pedrabrancadoamapari': {'lat': 0.7781, 'lon': -51.9472},
+    'pracuúba': {'lat': 1.7431, 'lon': -50.7858},
+    'serradonavio': {'lat': 0.8953, 'lon': -52.0019},
+    'vitóriadojari': {'lat': -1.1328, 'lon': -52.4244}
+}
+
+# Construção do DataFrame de coordenadas baseado na seleção de filtros
+map_records = []
+if sel_municipio == "TODOS":
+    for _, r in df_urnas.iterrows():
+        m_key = r['mun_id']
+        if m_key in geo_data:
+            da_v = df_dados_analise[df_dados_analise['mun_id'] == m_key]['votos'].sum()
+            cv_v = df_convertidos[df_convertidos['mun_id'] == m_key]['votos'].sum()
+            ur_v = r['marcio'] + r['liliane'] + r['acácio']
+            map_records.append({
+                'latitude': geo_data[m_key]['lat'],
+                'longitude': geo_data[m_key]['lon'],
+                'Urnas (Mancha 1)': ur_v,
+                'Conquistados (Mancha 2)': da_v,
+                'Convertidos (Mancha 3)': cv_v
+            })
+else:
+    if m_id in geo_data:
+        map_records.append({
+            'latitude': geo_data[m_id]['lat'],
+            'longitude': geo_data[m_id]['lon'],
+            'Urnas (Mancha 1)': teto_urnas,
+            'Conquistados (Mancha 2)': votos_dados_analise,
+            'Convertidos (Mancha 3)': votos_convertidos
+        })
+
+if map_records:
+    df_map = pd.DataFrame(map_records)
+    st.map(df_map, latitude='latitude', longitude='longitude', size='Conquistados (Mancha 2)')
+else:
+    st.info("Coordenadas geográficas indisponíveis para o escopo atual.")
+
+st.markdown("---")
+
 # 6. Renderização Gráfica do Mapa de Manchas (HTML5 e CSS Inline Autônomo)
 st.subheader("🔥 Distribuição Geométrica Digital das Manchas de Calor")
 
@@ -249,7 +313,6 @@ if teto_urnas > 0:
     w_da = min(max_width, max(15, int((votos_dados_analise / teto_urnas) * 100))) if votos_dados_analise > 0 else 5
     w_cv = min(max_width, max(10, int((votos_convertidos / teto_urnas) * 100))) if votos_convertidos > 0 else 5
 
-    # Strings de percentagem formatadas isoladamente para evitar conflitos na f-string
     p_da_str = f"{aprov_da:.2f}%"
     p_cv_str = f"{aprov_cv:.2f}%"
 
@@ -302,3 +365,4 @@ st.sidebar.download_button(
     file_name="app.py",
     mime="text/x-python"
 )
+
