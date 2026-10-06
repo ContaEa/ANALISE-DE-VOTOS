@@ -149,38 +149,39 @@ def load_and_consolidate_datasets():
         {'mun': 'Tartarugalzinho', 'atend': 'ROSIVETE', 'votos': 7},
         {'mun': 'Tartarugalzinho', 'atend': 'FERNANDO SANTOS', 'votos': 37},
         {'mun': 'Tartarugalzinho', 'atend': 'SUELENE', 'votos': 19},
-        {'mun': 'Vitória do Jari', 'atend': 'LEANDRO DOS SANTOS SILVA', 'votos': 15}
-    ]
+    {'mun': 'Vitória do Jari', 'atend': 'LEANDRO DOS SANTOS SILVA', 'votos': 15}
+]
 
-    urnas_raw = [
-        {'municipio': 'Itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
-        {'municipio': 'Macapá', 'marcio': 89, 'liliane': 49, 'acácio': 1141},
-        {'municipio': 'Santana', 'marcio': 4, 'liliane': 3, 'acácio': 197},
-        {'municipio': 'Tartarugalzinho', 'marcio': 133, 'liliane': 994, 'acácio': 602},
-        {'municipio': 'Laranjal do Jari', 'marcio': 22, 'liliane': 0, 'acácio': 70},
-        {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38, 'acácio': 3479},
-        {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26, 'acácio': 1545},
-        {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545},
-        {'municipio': 'Calçoene', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Cutias', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Ferreira Gomes', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Pedra Branca do Amapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Serra do Navio', 'marcio': 0, 'liliane': 0, 'acácio': 0}
-    ]
+# PLANILHA 3: Urnas Mapeadas (Somas Consolidadas dos Candidatos)
+urnas_raw = [
+    {'municipio': 'Itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
+    {'municipio': 'Macapá', 'marcio': 89, 'liliane': 49, 'acácio': 1141},
+    {'municipio': 'Santana', 'marcio': 4, 'liliane': 3, 'acácio': 197},
+    {'municipio': 'Tartarugalzinho', 'marcio': 133, 'liliane': 994, 'acácio': 602},
+    {'municipio': 'Laranjal do Jari', 'marcio': 22, 'liliane': 0, 'acácio': 70},
+    {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38, 'acácio': 3479},
+    {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26, 'acácio': 1545},
+    {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545},
+    {'municipio': 'Calçoene', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+    {'municipio': 'Cutias', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+    {'municipio': 'Ferreira Gomes', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+    {'municipio': 'Oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+    {'municipio': 'Pedra Branca do Amapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+    {'municipio': 'Pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+    {'municipio': 'Serra do Navio', 'marcio': 0, 'liliane': 0, 'acácio': 0}
+]
 
-    df_da = pd.DataFrame(dados_analise_raw)
-    df_cv = pd.DataFrame(convertidos_raw)
-    df_ur = pd.DataFrame(urnas_raw)
+df_da = pd.DataFrame(dados_analise_raw)
+df_cv = pd.DataFrame(convertidos_raw)
+df_ur = pd.DataFrame(urnas_raw)
 
-    # Padronização de strings indexadas para chaves estáveis
-    for df in [df_da, df_cv]:
-        df['mun_id'] = df['mun'].str.lower().str.replace(" ", "").str.strip()
-        df['atend_id'] = df['atend'].str.upper().str.strip()
-        
-    df_ur['mun_id'] = df_ur['municipio'].str.lower().str.replace(" ", "").str.strip()
-    return df_da, df_cv, df_ur
+# Padronização de strings indexadas para chaves estáveis
+for df in [df_da, df_cv]:
+    df['mun_id'] = df['mun'].str.lower().str.replace(" ", "").str.strip()
+    df['atend_id'] = df['atend'].str.upper().str.strip()
+
+df_ur['mun_id'] = df_ur['municipio'].str.lower().str.replace(" ", "").str.strip()
+return df_da, df_cv, df_ur
 
 df_dados_analise, df_convertidos, df_urnas = load_and_consolidate_datasets()
 
@@ -251,6 +252,7 @@ st.markdown("---")
 # Camada de Geolocalização Integrada Nativa (Coordenadas Básicas do Amapá)
 st.subheader("🗺️ Mapeamento Espacial das Urnas e Clientes Mapeados")
 
+# Dicionário de geolocalização dos municípios do Amapá para plotagem
 geo_data = {
     'macapá': {'lat': -0.0349, 'lon': -51.0694},
     'santana': {'lat': -0.0583, 'lon': -51.1817},
@@ -291,6 +293,7 @@ else:
 
 if map_records:
     df_map = pd.DataFrame(map_records)
+    # Correção do parâmetro size para evitar erros JSON no DeckGL Chart
     st.map(df_map, latitude='latitude', longitude='longitude', size='votos')
 else:
     st.info("Coordenadas geográficas indisponíveis para o escopo atual.")
@@ -317,12 +320,12 @@ if teto_urnas > 0:
         </div>
         <div style='width: {w_da}%; min-width: 250px; background: rgba(255, 193, 7, 0.9); color: black; padding: 20px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 13px; text-transform: uppercase; font-weight: bold;'>&#128993; MANCHA 2: Volume Dados Análise</span>
-            <h3 style='margin: 5px 0 0 0; color: black;'>{votos_dados_analise} Mapeados e pendendo alcançar/Nossos eleitores</h3>
+            <h3 style='margin: 5px 0 0 0; color: black;'>{votos_dados_analise} Votos Mapeados</h3>
             <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px;'>Eficiência: {p_da_str}</span>
         </div>
         <div style='width: {w_cv}%; min-width: 200px; background: rgba(40, 167, 69, 0.9); color: white; padding: 18px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>&#128994; MANCHA 3: Desempenho Convertidos</span>
-            <h4 style='margin: 5px 0 0 0; color: white;'>{votos_convertidos} Colmeias</h4>
+            <h4 style='margin: 5px 0 0 0; color: white;'>{votos_convertidos} Votos Qualificados</h4>
             <span style='background: white; color: #28a745; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 5px;'>Conversão Real: {p_cv_str}</span>
         </div>
     </div>
@@ -337,6 +340,7 @@ st.markdown("---")
 st.subheader("🏆 Ranking de Desempenho e Conversão por Atendente")
 
 if not df_da_f.empty:
+    # Agrupamento e cálculo de participações
     rank_df = df_da_f.groupby('atend_id')['votos'].sum().reset_index()
     rank_df.columns = ['Atendente', 'Votos Conquistados']
     rank_df['% Proporção sobre Urnas'] = (rank_df['Votos Conquistados'] / teto_urnas * 100).round(2) if teto_urnas > 0 else 0
@@ -350,6 +354,8 @@ st.sidebar.subheader("💾 Backup do Código Fonte")
 with open(__file__, "r", encoding="utf-8") as f:
     source_code = f.read()
 
+st.sidebar.download_button(
+    label="📥 Descarregar arquivo .py",
 st.sidebar.download_button(
     label="📥 Descarregar arquivo .py",
     data=source_code,
