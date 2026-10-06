@@ -125,31 +125,31 @@ def load_and_consolidate_datasets():
 
     # PLANILHA 2: Análise Convertidos (Base Qualificada de Última Milha)
     convertidos_raw = [
-        {'mun': 'Amapá', 'atend': 'RAY', 'votos': 9},
-        {'mun': 'Itaubal', 'atend': 'ADELSON', 'votos': 46},
-        {'mun': 'Itaubal', 'atend': 'ANE TOLOSA', 'votos': 231},
-        {'mun': 'Itaubal', 'atend': 'GLENDA', 'votos': 5},
-        {'mun': 'Laranjal do Jari', 'atend': 'EDSON', 'votos': 153},
-        {'mun': 'Macapá', 'atend': 'AYENN TEIXEIRA SILVA', 'votos': 28},
-        {'mun': 'Macapá', 'atend': 'BRENDA', 'votos': 97},
-        {'mun': 'Macapá', 'atend': 'FERNANDO SANTOS', 'votos': 130},
-        {'mun': 'Macapá', 'atend': 'ILETE', 'votos': 69},
-        {'mun': 'Macapá', 'atend': 'JOSIVAN', 'votos': 116},
-        {'mun': 'Macapá', 'atend': 'LUANNA', 'votos': 116},
-        {'mun': 'Macapá', 'atend': 'MEL', 'votos': 148},
-        {'mun': 'Macapá', 'atend': 'VAL', 'votos': 5},
-        {'mun': 'Mazagão', 'atend': 'FERNANDO SANTOS', 'votos': 93},
-        {'mun': 'Mazagão', 'atend': 'JOSIVAN', 'votos': 5},
-        {'mun': 'Porto Grande', 'atend': 'JOSIVAN', 'votos': 14},
-        {'mun': 'Santana', 'atend': 'ADRYELLY SILVA DA SILVA', 'votos': 143},
-        {'mun': 'Santana', 'atend': 'FERNANDO SANTOS', 'votos': 102},
-        {'mun': 'Santana', 'atend': 'JOSIVAN', 'votos': 14},
-        {'mun': 'Santana', 'atend': 'MEL', 'votos': 42},
-        {'mun': 'Santana', 'atend': 'VAL', 'votos': 74},
-        {'mun': 'Tartarugalzinho', 'atend': 'ROSIVETE', 'votos': 32},
-        {'mun': 'Tartarugalzinho', 'atend': 'FERNANDO SANTOS', 'votos': 171},
-        {'mun': 'Tartarugalzinho', 'atend': 'SUELENE', 'votos': 88},
-        {'mun': 'Vitória do Jari', 'atend': 'LEANDRO DOS SANTOS SILVA', 'votos': 69}
+        {'mun': 'Amapá', 'atend': 'RAY', 'votos': 2},
+        {'mun': 'Itaubal', 'atend': 'ADELSON', 'votos': 10},
+        {'mun': 'Itaubal', 'atend': 'ANE TOLOSA', 'votos': 50},
+        {'mun': 'Itaubal', 'atend': 'GLENDA', 'votos': 1},
+        {'mun': 'Laranjal do Jari', 'atend': 'EDSON', 'votos': 33},
+        {'mun': 'Macapá', 'atend': 'AYENN TEIXEIRA SILVA', 'votos': 6},
+        {'mun': 'Macapá', 'atend': 'BRENDA', 'votos': 21},
+        {'mun': 'Macapá', 'atend': 'FERNANDO SANTOS', 'votos': 28},
+        {'mun': 'Macapá', 'atend': 'ILETE', 'votos': 15},
+        {'mun': 'Macapá', 'atend': 'JOSIVAN', 'votos': 25},
+        {'mun': 'Macapá', 'atend': 'LUANNA', 'votos': 25},
+        {'mun': 'Macapá', 'atend': 'MEL', 'votos': 32},
+        {'mun': 'Macapá', 'atend': 'VAL', 'votos': 1},
+        {'mun': 'Mazagão', 'atend': 'FERNANDO SANTOS', 'votos': 20},
+        {'mun': 'Mazagão', 'atend': 'JOSIVAN', 'votos': 1},
+        {'mun': 'Porto Grande', 'atend': 'JOSIVAN', 'votos': 3},
+        {'mun': 'Santana', 'atend': 'ADRYELLY SILVA DA SILVA', 'votos': 31},
+        {'mun': 'Santana', 'atend': 'FERNANDO SANTOS', 'votos': 22},
+        {'mun': 'Santana', 'atend': 'JOSIVAN', 'votos': 3},
+        {'mun': 'Santana', 'atend': 'MEL', 'votos': 9},
+        {'mun': 'Santana', 'atend': 'VAL', 'votos': 16},
+        {'mun': 'Tartarugalzinho', 'atend': 'ROSIVETE', 'votos': 7},
+        {'mun': 'Tartarugalzinho', 'atend': 'FERNANDO SANTOS', 'votos': 37},
+        {'mun': 'Tartarugalzinho', 'atend': 'SUELENE', 'votos': 19},
+        {'mun': 'Vitória do Jari', 'atend': 'LEANDRO DOS SANTOS SILVA', 'votos': 15}
     ]
 
     urnas_raw = [
@@ -317,7 +317,7 @@ if teto_urnas > 0:
         </div>
         <div style='width: {w_da}%; min-width: 250px; background: rgba(255, 193, 7, 0.9); color: black; padding: 20px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 13px; text-transform: uppercase; font-weight: bold;'>&#128993; MANCHA 2: Volume Dados Análise</span>
-            <h3 style='margin: 5px 0 0 0; color: black;'>{votos_dados_analise} Teto de votos</h3>
+            <h3 style='margin: 5px 0 0 0; color: black;'>{votos_dados_analise} Mapeados e pendendo alcançar/Nossos eleitores</h3>
             <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px;'>Eficiência: {p_da_str}</span>
         </div>
         <div style='width: {w_cv}%; min-width: 200px; background: rgba(40, 167, 69, 0.9); color: white; padding: 18px; border-radius: 6px; font-family: sans-serif;'>
