@@ -109,7 +109,7 @@ with k_cv:
 st.markdown("---")
 
 # 7. Renderização do Gráfico Dinâmico de Manchas Concêntricas (HTML/CSS Autônomo)
-st.subheader("🔥 Mapa de Calor Eleitoral: Distribution Geometrica das Manchas")
+st.subheader("🔥 Mapa de Calor Eleitoral: Distribuição Geométrica das Manchas")
 
 if total_votos_municipio > 0:
     max_box_width = 100
@@ -120,19 +120,19 @@ if total_votos_municipio > 0:
     manchas_html = f"""
     <div style='display: flex; flex-direction: column; gap: 20px; width: 100%; padding: 15px; background: #111; border-radius: 8px;'>
         <div style='width: 100%; background: rgba(220, 53, 69, 0.9); color: white; padding: 25px; border-radius: 6px; font-family: sans-serif;'>
-            <span style='font-size: 14px; text-transform: uppercase; font-weight: bold;'>⚫ MANCHA 1: Urnas Mapeadas</span>
+            <span style='font-size: 14px; text-transform: uppercase; font-weight: bold;'>&#9899; MANCHA 1: Urnas Mapeadas</span>
             <h2 style='margin: 5px 0 0 0; color: white;'>{total_votos_municipio} Votos Reais</h2>
             <p style='margin: 5px 0 0 0; font-size:13px; opacity:0.8;'>Marcio: {votos_marcio} | Liliane: {votos_liliane} | Acácio: {votos_acacio}</p>
         </div>
         <div style='width: {width_sd}%; min-width: 250px; background: rgba(255, 193, 7, 0.9); color: black; padding: 20px; border-radius: 6px; font-family: sans-serif;'>
-            <span style='font-size: 13px; text-transform: uppercase; font-weight: bold;'>🟡 MANCHA 2: Seus Dados</span>
+            <span style='font-size: 13px; text-transform: uppercase; font-weight: bold;'>&#128993; MANCHA 2: Seus Dados</span>
             <h3 style='margin: 5px 0 0 0; color: black;'>{count_seus_dados} Clientes</h3>
-            <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;'>Aproveitamento: {aprov_sd:.2f}%</span>
+            <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px;'>Aproveitamento: {aprov_sd:.2f}%</span>
         </div>
         <div style='width: {width_cv}%; min-width: 200px; background: rgba(40, 167, 69, 0.9); color: white; padding: 18px; border-radius: 6px; font-family: sans-serif;'>
-            <span style='font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>🟢 MANCHA 3: Convertidos</span>
+            <span style='font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>&#128994; MANCHA 3: Convertidos</span>
             <h4 style='margin: 5px 0 0 0; color: white;'>{count_convertidos} Clientes</h4>
-            <span style='background: white; color: #28a745; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;'>Aproveitamento Final: {aprov_cv:.2f}%</span>
+            <span style='background: white; color: #28a745; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 5px;'>Aproveitamento Final: {aprov_cv:.2f}%</span>
         </div>
     </div>
     """
