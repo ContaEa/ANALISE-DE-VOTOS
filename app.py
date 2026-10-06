@@ -251,7 +251,6 @@ st.markdown("---")
 # Camada de Geolocalização Integrada Nativa (Coordenadas Básicas do Amapá)
 st.subheader("🗺️ Mapeamento Espacial das Urnas e Clientes Mapeados")
 
-# Dicionário de geolocalização dos municípios do Amapá para plotagem
 geo_data = {
     'macapá': {'lat': -0.0349, 'lon': -51.0694},
     'santana': {'lat': -0.0583, 'lon': -51.1817},
@@ -292,7 +291,6 @@ else:
 
 if map_records:
     df_map = pd.DataFrame(map_records)
-    # Correção do parâmetro size para evitar erros JSON no DeckGL Chart
     st.map(df_map, latitude='latitude', longitude='longitude', size='votos')
 else:
     st.info("Coordenadas geográficas indisponíveis para o escopo atual.")
@@ -307,7 +305,6 @@ if teto_urnas > 0:
     w_da = min(max_width, max(15, int((votos_dados_analise / teto_urnas) * 100))) if votos_dados_analise > 0 else 5
     w_cv = min(max_width, max(10, int((votos_convertidos / teto_urnas) * 100))) if votos_convertidos > 0 else 5
 
-    # Strings de percentagem formatadas com aspas simples para eliminar o SyntaxError
     p_da_str = f"{aprov_da:.2f}%"
     p_cv_str = f"{aprov_cv:.2f}%"
 
@@ -340,7 +337,6 @@ st.markdown("---")
 st.subheader("🏆 Ranking de Desempenho e Conversão por Atendente")
 
 if not df_da_f.empty:
-    # Agrupamento e cálculo de participações
     rank_df = df_da_f.groupby('atend_id')['votos'].sum().reset_index()
     rank_df.columns = ['Atendente', 'Votos Conquistados']
     rank_df['% Proporção sobre Urnas'] = (rank_df['Votos Conquistados'] / teto_urnas * 100).round(2) if teto_urnas > 0 else 0
@@ -354,7 +350,6 @@ st.sidebar.subheader("💾 Backup do Código Fonte")
 with open(__file__, "r", encoding="utf-8") as f:
     source_code = f.read()
 
-st.sidebar.download_button(
 st.sidebar.download_button(
     label="📥 Descarregar arquivo .py",
     data=source_code,
