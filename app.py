@@ -248,7 +248,7 @@ with k3:
 
 st.markdown("---")
 
-# NEW: Camada de Geolocalização Integrada Nativa (Coordenadas do Amapá)
+# Camada de Geolocalização Integrada Nativa (Coordenadas Básicas do Amapá)
 st.subheader("🗺️ Mapeamento Espacial das Urnas e Clientes Mapeados")
 
 # Dicionário de geolocalização dos municípios do Amapá para plotagem
@@ -271,35 +271,29 @@ geo_data = {
     'vitóriadojari': {'lat': -1.1328, 'lon': -52.4244}
 }
 
-# Construção do DataFrame de coordenadas baseado na seleção de filtros
 map_records = []
 if sel_municipio == "TODOS":
     for _, r in df_urnas.iterrows():
         m_key = r['mun_id']
         if m_key in geo_data:
             da_v = df_dados_analise[df_dados_analise['mun_id'] == m_key]['votos'].sum()
-            cv_v = df_convertidos[df_convertidos['mun_id'] == m_key]['votos'].sum()
-            ur_v = r['marcio'] + r['liliane'] + r['acácio']
             map_records.append({
                 'latitude': geo_data[m_key]['lat'],
                 'longitude': geo_data[m_key]['lon'],
-                'Urnas (Mancha 1)': ur_v,
-                'Conquistados (Mancha 2)': da_v,
-                'Convertidos (Mancha 3)': cv_v
+                'votos': int(da_v) if da_v > 0 else 1
             })
 else:
     if m_id in geo_data:
         map_records.append({
             'latitude': geo_data[m_id]['lat'],
             'longitude': geo_data[m_id]['lon'],
-            'Urnas (Mancha 1)': teto_urnas,
-            'Conquistados (Mancha 2)': votos_dados_analise,
-            'Convertidos (Mancha 3)': votos_convertidos
+            'votos': int(votos_dados_analise) if votos_dados_analise > 0 else 1
         })
 
 if map_records:
     df_map = pd.DataFrame(map_records)
-    st.map(df_map, latitude='latitude', longitude='longitude', size='Conquistados (Mancha 2)')
+    # Correção crucial do parâmetro "size" para evitar erros JSON no DeckGL Chart
+    st.map(df_map, latitude='latitude', longitude='longitude', size='votos')
 else:
     st.info("Coordenadas geográficas indisponíveis para o escopo atual.")
 
@@ -362,7 +356,9 @@ with open(__file__, "r", encoding="utf-8") as f:
 st.sidebar.download_button(
     label="📥 Descarregar arquivo .py",
     data=source_code,
+st.sidebar.download_button(
+    label="📥 Descarregar arquivo .py",
+    data=source_code,
     file_name="app.py",
     mime="text/x-python"
 )
-
