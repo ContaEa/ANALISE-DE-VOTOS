@@ -149,39 +149,38 @@ def load_and_consolidate_datasets():
         {'mun': 'Tartarugalzinho', 'atend': 'ROSIVETE', 'votos': 7},
         {'mun': 'Tartarugalzinho', 'atend': 'FERNANDO SANTOS', 'votos': 37},
         {'mun': 'Tartarugalzinho', 'atend': 'SUELENE', 'votos': 19},
-    {'mun': 'Vitória do Jari', 'atend': 'LEANDRO DOS SANTOS SILVA', 'votos': 15}
-]
+        {'mun': 'Vitória do Jari', 'atend': 'LEANDRO DOS SANTOS SILVA', 'votos': 15}
+    ]
 
-# PLANILHA 3: Urnas Mapeadas (Somas Consolidadas dos Candidatos)
-urnas_raw = [
-    {'municipio': 'Itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
-    {'municipio': 'Macapá', 'marcio': 89, 'liliane': 49, 'acácio': 1141},
-    {'municipio': 'Santana', 'marcio': 4, 'liliane': 3, 'acácio': 197},
-    {'municipio': 'Tartarugalzinho', 'marcio': 133, 'liliane': 994, 'acácio': 602},
-    {'municipio': 'Laranjal do Jari', 'marcio': 22, 'liliane': 0, 'acácio': 70},
-    {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38, 'acácio': 3479},
-    {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26, 'acácio': 1545},
-    {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545},
-    {'municipio': 'Calçoene', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-    {'municipio': 'Cutias', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-    {'municipio': 'Ferreira Gomes', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-    {'municipio': 'Oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-    {'municipio': 'Pedra Branca do Amapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-    {'municipio': 'Pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-    {'municipio': 'Serra do Navio', 'marcio': 0, 'liliane': 0, 'acácio': 0}
-]
+    urnas_raw = [
+        {'municipio': 'Itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
+        {'municipio': 'Macapá', 'marcio': 89, 'liliane': 49, 'acácio': 1141},
+        {'municipio': 'Santana', 'marcio': 4, 'liliane': 3, 'acácio': 197},
+        {'municipio': 'Tartarugalzinho', 'marcio': 133, 'liliane': 994, 'acácio': 602},
+        {'municipio': 'Laranjal do Jari', 'marcio': 22, 'liliane': 0, 'acácio': 70},
+        {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38, 'acácio': 3479},
+        {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26, 'acácio': 1545},
+        {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545},
+        {'municipio': 'Calçoene', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Cutias', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Ferreira Gomes', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Pedra Branca do Amapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'Serra do Navio', 'marcio': 0, 'liliane': 0, 'acácio': 0}
+    ]
 
-df_da = pd.DataFrame(dados_analise_raw)
-df_cv = pd.DataFrame(convertidos_raw)
-df_ur = pd.DataFrame(urnas_raw)
+    df_da = pd.DataFrame(dados_analise_raw)
+    df_cv = pd.DataFrame(convertidos_raw)
+    df_ur = pd.DataFrame(urnas_raw)
 
-# Padronização de strings indexadas para chaves estáveis
-for df in [df_da, df_cv]:
-    df['mun_id'] = df['mun'].str.lower().str.replace(" ", "").str.strip()
-    df['atend_id'] = df['atend'].str.upper().str.strip()
-
-df_ur['mun_id'] = df_ur['municipio'].str.lower().str.replace(" ", "").str.strip()
-return df_da, df_cv, df_ur
+    # Padronização de strings indexadas para chaves estáveis
+    for df in [df_da, df_cv]:
+        df['mun_id'] = df['mun'].str.lower().str.replace(" ", "").str.strip()
+        df['atend_id'] = df['atend'].str.upper().str.strip()
+        
+    df_ur['mun_id'] = df_ur['municipio'].str.lower().str.replace(" ", "").str.strip()
+    return df_da, df_cv, df_ur
 
 df_dados_analise, df_convertidos, df_urnas = load_and_consolidate_datasets()
 
@@ -354,8 +353,6 @@ st.sidebar.subheader("💾 Backup do Código Fonte")
 with open(__file__, "r", encoding="utf-8") as f:
     source_code = f.read()
 
-st.sidebar.download_button(
-    label="📥 Descarregar arquivo .py",
 st.sidebar.download_button(
     label="📥 Descarregar arquivo .py",
     data=source_code,
