@@ -135,86 +135,113 @@ def load_and_clean_data():
         {'municipio': 'cutias', 'marcio': 0, 'liliane': 0, 'acácio': 0},
         {'municipio': 'ferreiragomes', 'marcio': 0, 'liliane': 0, 'acácio': 0},
         {'municipio': 'itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
-{'municipio': 'laranjaldojari', 'marcio': 8991, 'liliane': 0, 'acácio': 4518},
-{'municipio': 'macapá', 'marcio': 6328, 'liliane': 3862, 'acácio': 68171},
-{'municipio': 'mazagão', 'marcio': 9545, 'liliane': 342, 'acácio': 78},
-{'municipio': 'oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-{'municipio': 'pedrabrancadoamapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-{'municipio': 'portogrande', 'marcio': 1, 'liliane': 0, 'acácio': 0},
-{'municipio': 'pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-{'municipio': 'santana', 'marcio': 32, 'liliane': 6, 'acácio': 394},
-{'municipio': 'tartarugalzinho', 'marcio': 216, 'liliane': 1512, 'acácio': 952},
-{'municipio': 'vitória do jari', 'marcio': 29, 'liliane': 2, 'acácio': 151}
-]
-df1 = pd.DataFrame(clients_raw)
-df2 = pd.DataFrame(urnas_raw)
-# Higienização de strings para compatibilidade matemática de joins e buscas
-df1['municipio_id'] = df1['municipio'].str.lower().str.replace(" ", "").str.strip()
-df2['municipio_id'] = df2['municipio'].str.lower().str.replace(" ", "").str.strip()
-df1['atendente'] = df1['atendente'].str.upper().str.strip()
-return df1, df2
+        {'municipio': 'laranjaldojari', 'marcio': 8991, 'liliane': 0, 'acácio': 4518},
+        {'municipio': 'macapá', 'marcio': 6328, 'liliane': 3862, 'acácio': 68171},
+        {'municipio': 'mazagão', 'marcio': 9545, 'liliane': 342, 'acácio': 78},
+        {'municipio': 'oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'pedrabrancadoamapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'portogrande', 'marcio': 1, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
+        {'municipio': 'santana', 'marcio': 32, 'liliane': 6, 'acácio': 394},
+        {'municipio': 'tartarugalzinho', 'marcio': 216, 'liliane': 1512, 'acácio': 952},
+        {'municipio': 'vitória do jari', 'marcio': 29, 'liliane': 2, 'acácio': 151}
+    ]
+    
+    df1 = pd.DataFrame(clients_raw)
+    df2 = pd.DataFrame(urnas_raw)
+    
+    # Higienização de strings para compatibilidade matemática de joins e buscas
+    df1['municipio_id'] = df1['municipio'].str.lower().str.replace(" ", "").str.strip()
+    df2['municipio_id'] = df2['municipio'].str.lower().str.replace(" ", "").str.strip()
+    df1['atendente'] = df1['atendente'].str.upper().str.strip()
+    
+    return df1, df2
+
 df_clients, df_urnas = load_and_clean_data()
+
+# 3. Componente Lateral de Filtragem Dinâmica
 st.sidebar.header("🎯 Parâmetros Analíticos")
 all_municipios = sorted(df_clients['municipio'].unique())
 selected_municipio = st.sidebar.selectbox("Selecione o Município:", all_municipios)
+
+# Resolução das chaves relacionais indexadas
 selected_id = selected_municipio.lower().replace(" ", "").strip()
 df_c_filtered = df_clients[df_clients['municipio_id'] == selected_id]
 df_u_filtered = df_urnas[df_urnas['municipio_id'] == selected_id]
+
+# 4. Motor de Distribuição Proporcional Pro-Rata
 total_clientes_mun = len(df_c_filtered)
 votos_marcio = df_u_filtered['marcio'].sum() if not df_u_filtered.empty else 0
 votos_liliane = df_u_filtered['liliane'].sum() if not df_u_filtered.empty else 0
 votos_acacio = df_u_filtered['acácio'].sum() if not df_u_filtered.empty else 0
 total_votos_mun = votos_marcio + votos_liliane + votos_acacio
+
 atendente_counts = df_c_filtered['atendente'].value_counts()
 atendente_data = []
+
 for atendente, count in atendente_counts.items():
-proporcao = count / total_clientes_mun if total_clientes_mun > 0 else 0
-atendente_data.append({
-'Atendente': atendente,
-'Clientes Cadastrados': count,
-'Marcio (Estimado)': int(votos_marcio * proporcao),
-'Liliane (Estimado)': int(votos_liliane * proporcao),
-'Acácio (Estimado)': int(votos_acacio * proporcao),
-'Total Estimado': int(total_votos_mun * proporcao)
-})
+    proporcao = count / total_clientes_mun if total_clientes_mun > 0 else 0
+    atendente_data.append({
+        'Atendente': atendente,
+        'Clientes Cadastrados': count,
+        'Marcio (Estimado)': int(votos_marcio * proporcao),
+        'Liliane (Estimado)': int(votos_liliane * proporcao),
+        'Acácio (Estimado)': int(votos_acacio * proporcao),
+        'Total Estimado': int(total_votos_mun * proporcao)
+    })
+
 df_performance = pd.DataFrame(atendente_data)
+
+# 5. Dashboard Executivo - Indicadores de Performance (KPIs)
 st.subheader(f"📈 Panorama Estrutural - {selected_municipio.upper()}")
 kpi1, kpi2, kpi3 = st.columns(3)
 with kpi1:
-st.metric("Clientes Ativos Mapeados", f"{total_clientes_mun} u")
+    st.metric("Clientes Ativos Mapeados", f"{total_clientes_mun} u")
 with kpi2:
-st.metric("Votos Consolidados nas Urnas", f"{total_votos_mun} votos")
+    st.metric("Votos Consolidados nas Urnas", f"{total_votos_mun} votos")
 with kpi3:
-indice = (total_clientes_mun / total_votos_mun * 100) if total_votos_mun > 0 else 0
-st.metric("Taxa de Penetração Comercial", f"{indice:.2f}%" if total_votos_mun > 0 else "0.00% (Sem Votos)")
+    indice = (total_clientes_mun / total_votos_mun * 100) if total_votos_mun > 0 else 0
+    st.metric("Taxa de Penetração Comercial", f"{indice:.2f}%" if total_votos_mun > 0 else "0.00% (Sem Votos)")
+
 st.markdown("---")
+
+# 6. Mapeamento Matricial - Mapa de Calor HTML/CSS Inline (Segurança Total)
 st.subheader("🔥 Mapa de Calor Eleitoral: Atendentes x Candidatos")
 if not df_performance.empty and total_votos_mun > 0:
-df_heat = df_performance[['Atendente', 'Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']].copy()
-max_val = df_heat[['Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']].max().max()
-if max_val == 0: max_val = 1
-html_table = ""
-html_table += ""
-html_table += "Atendente"
-html_table += "Marcio"
-html_table += "Liliane"
-html_table += "Acácio"
-html_table += ""
-for _, row in df_heat.iterrows():
-html_table += f"{row['Atendente']}"
-for cand in ['Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']:
-val = row[cand]
-alpha = (val / max_val) * 0.85  # Normalização dinâmica de opacidade
-html_table += f"<td style='border: 1px solid #ddd; background-color: rgba(220, 53, 69, {alpha:.2f}); color: {'#000' if alpha < 0.4 else '#fff'}; font-weight: bold;'>{val}"
-html_table += ""
-html_table += ""
-st.write(html_table, unsafe_allow_html=True)
+    df_heat = df_performance[['Atendente', 'Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']].copy()
+    
+    max_val = df_heat[['Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']].max().max()
+    if max_val == 0: max_val = 1
+
+    html_table = "<table style='width:100%; border-collapse: collapse; font-family: sans-serif; text-align: center;'>"
+    html_table += "<tr style='background-color: #f4f4f4; color: #333; font-weight: bold;'>"
+    html_table += "<th style='padding: 12px; border: 1px solid #ddd;'>Atendente</th>"
+    html_table += "<th style='border: 1px solid #ddd;'>Marcio</th>"
+    html_table += "<th style='border: 1px solid #ddd;'>Liliane</th>"
+    html_table += "<th style='border: 1px solid #ddd;'>Acácio</th>"
+    html_table += "</tr>"
+    
+    for _, row in df_heat.iterrows():
+        html_table += f"<tr><td style='padding: 12px; font-weight: bold; border: 1px solid #ddd; background-color: #fafafa;'>{row['Atendente']}</td>"
+        for cand in ['Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']:
+            val = row[cand]
+            alpha = (val / max_val) * 0.85
+            html_table += f"<td style='border: 1px solid #ddd; background-color: rgba(220, 53, 69, {alpha:.2f}); color: {'#000' if alpha < 0.4 else '#fff'}; font-weight: bold;'>{val}</td>"
+        html_table += "</tr>"
+    html_table += "</table>"
+    
+    st.write(html_table, unsafe_allow_html=True)
 else:
-st.info(f"O município de {selected_municipio.upper()} não possui histórico de votação mapeado ou o volume de votos nas seções é zero.")
+    st.info(f"O município de {selected_municipio.upper()} não possui histórico de votação mapeado ou o volume de votos nas seções é zero.")
+
 st.markdown("---")
+
+# 7. Ranking de Performance Geral e Filtros por Alvo
 st.subheader("🏆 Ranking de Conversão por Atendente")
 if not df_performance.empty:
-selected_candidato = st.selectbox("Selecione o Candidato para Filtrar o Ranking:", ['Total Estimado', 'Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)'])
-df_performance['% Proporção sobre as Urnas'] = (df_performance[selected_candidato] / total_votos_mun * 100).round(2) if total_votos_mun > 0 else 0
-ranking_final = df_performance[['Atendente', 'Clientes Cadastrados', selected_candidato, '% Proporção sobre as Urnas']]
-st.dataframe(ranking_final.sort_values(by=selected_candidato, ascending=False), use_container_width=True)
+    selected_candidato = st.selectbox("Selecione o Candidato para Filtrar o Ranking:", ['Total Estimado', 'Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)'])
+    
+    df_performance['% Proporção sobre as Urnas'] = (df_performance[selected_candidato] / total_votos_mun * 100).round(2) if total_votos_mun > 0 else 0
+    ranking_final = df_performance[['Atendente', 'Clientes Cadastrados', selected_candidato, '% Proporção sobre as Urnas']]
+    
+    st.dataframe(ranking_final.sort_values(by=selected_candidato, ascending=False), use_container_width=True)
