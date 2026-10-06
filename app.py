@@ -2,246 +2,161 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# 1. Configuração Nativa do Ambiente
-st.set_page_config(page_title="Analytics Eleitoral - Amapá", layout="wide", page_icon="🗳️")
+# 1. Configuração de Performance e Layout da Página
+st.set_page_config(page_title="BI Eleitoral - Mapeamento de Manchas", layout="wide", page_icon="🗳️")
 
-st.title("📊 Painel de BI Eleitoral - Árvore Completa (Amapá)")
+st.title("🎯 Painel Analítico de BI - Aproveitamento de Votos por Manchas")
+st.markdown("Análise de penetração e conversão de bases cadastrais sobre o total de votos apurados por município.")
 st.markdown("---")
 
-# 2. Pipeline de Carga e Consolidação Massiva de Dados Reais
+# 2. Pipeline de Dados Integrado e Higienizado (Dados Reais das 3 Planilhas)
 @st.cache_data
-def load_and_clean_data():
-    # Mapeamento consolidado e integral de Clientes x Atendentes por Município
-    clients_raw = {
-        'Cliente': [
-            # Amapá
-            'VANUBIA DOS SANTOS ABREU', 'RAIMUNDO CORREA NOBRE', 'GIZELE SANTOS SOUZA', 'RAIMUNDO CORREA NOBRE',
-            'LIVIA CELIA MENDES', 'NICOLY PALHETA DE BARROS', 'ALERRANDRO BARBOSA DE OLIVEIRA', 'MANOEL CABRALZINHO SOUZA DOS SANTOS',
-            'JORGE FELIPE BARBOSA COSTA', 'EMANUEL DAVY SILVA MOREIRA', 'LEONILSON CASTRO', 'ALINE VITORIA NUNES ARRUDA',
-            'VANUBIA DOS SANTOS ABREU', 'MARCOS VINICIUS FARIAS SENA', 'GIZELE SANTOS SOUZA', 'GIRLANE SANTOS DE SOUZA',
-            'TAINA CASTRO SANTANA', 'JEDIELSON CASTOR DE FREITAS', 'JOSI DOS SANTOS CASTRO', 'LEONILSON CASTRO',
-            'JOSE ALBINO DOS SANTOS', 'MARIA LUCIDIA FORTUNATO DA SILVA', 'SAMYLLE RIANNE COSTA DOS SANTOS', 'MARCOS VINICIUS FARIAS SENA',
-            'TAINA CASTRO SANTANA', 'ALINE VITORIA NUNES ARRUDA', 'EZENI SILVA DA PAIXAO', 'ALERRANDRO BARBOSA DE OLIVEIRA',
-            'IVANIL DOS PASSOS BRITO', 'CLAUSIDETE CAMPOS DOS SANTOS', 'MARIA LUCIDIA FORTUNATO DA SILVA', 'ANA FABIOLA ALMEIDA CORREA',
-            'ANA FABIOLA ALMEIDA CORREA', 'DAYANE COSTA CORREIA', 'EZENI SILVA DA PAIXAO', 'MANOEL CABRALZINHO SOUZA DOS SANTOS',
-            'RAIMUNDO CORREA NOBRE', 'NELMA DE LIMA SOUZA', 'FRANCIELE DOS SANTOS QUARESMA', 'EMANUEL DAVY SILVA MOREIRA',
-            'THALICIA FERNANDA BRITO SILVA', 'CARLA HIORRANA BRITO SILVA', 'IVANELSON MAGAVE AMADOR', 'GESSICA CRISTINA BARBOSA MACIEL',
-            'ISMAEL SALES RAMOS', 'MARIA NEUZA OLIVEIRA DA SILVA',
-            # Calçoene
-            'BENEDITO COSTA BARBOSA', 'ALINE CRISTINA DE NAZARÉ CORDEIRO DUTRA', 'HELIO LACERDA DOS SANTOS', 'ALEXANDRO ALVES PINHEIRO',
-            'MARIA EDUARDA DOS SANTOS RODRIGUES', 'IRENILDES GOMES SILVA', 'ALINE CRISTINA DE NAZARÉ CORDEIRO DUTRA', 'MARIA ELIANA MIRANDA DE SOUSA',
-            'MARIA LUIZA SOUZA MARINHO', 'JOSE RIBAMAR DA CRUZ RODRIGUES', 'ALICE FEITOSA DOS SANTOS', 'ALEXANDRO ALVES PINHEIRO',
-            # Cutias
-            'EDIANE DA SILVA FERREIRA', 'LIA SILVA COSTA', 'THAYSSA TOLOSA PEREIRA', 'RAISSA PEREIRA DOS SANTOS',
-            # Ferreira Gomes
-            'SAMUEL YAGO DOS SANTOS QUARESMA', 'JOVANA DOS SANTOS NASCIMENTO', 'RAIMUNDA FARAILDE SILVA', 'LANA DOS SANTOS RODRIGUES',
-            # Itaubal
-            'ROSIVAL RODRIGUES SENA', 'PAULO DOS SANTOS TEIXEIRA', 'MARIA DE JESUS DE OLIVEIRA SOUZA', 'RAIMUNDA TEIXEIRA PANTOJA',
-            'MARIA EDUARDA BARBOSA COSTA', 'MARIA CLARA SOUZA BRITO', 'ANDRYA LORENA CAMPOS PEREIRA', 'ANDRYA LORENA CAMPOS PEREIRA',
-            # Laranjal do Jari
-            'DECIZIENE FLEXA PINTO', 'ELIZEU DE SOUZA MENDES', 'DARA NICOLY LIMA DA SILVA DOS SANTOS', 'RENATA EMANUELE BRAGANÇA SANTOS',
-            # Macapá
-            'DARCIVALDO DOS PASSOS BASTOS', 'ANTONIO RODRIGUES SIQUEIRA FILHO', 'MARIA GUACIMARA CORREIA DOS SANTOS', 'RUAN LEITÃO BORGES',
-            'NAELI COSTA DA COSTA', 'KEMILLY MARIA ROCHA PINHEIRO', 'ELIANE DOS SANTOS RAMOS', 'MAYLON HENRIQUE DOS REIS LIRA',
-            # Mazagão
-            'GLEICILENE DA SILVA MIRANDA', 'ÉVILI DE OLIVEIRA MIRANDA', 'ELIVANA BELO DA SILVA', 'CAMILA VITORIA CARDOSO FURTADO',
-            # Oiapoque
-            'RAIMUNDA CARDOSO DUARTE', 'OSVALDO DO NASCIMENTO GONÇALVES', 'JOSÉ FERREIRA PINHEIRO', 'TIBURCIO SOUZA E SILVA',
-            # Pedra Branca do Amapari
-            'RAYSSA DE ALMEIDA COSTA', 'GABRIEL ARCANJO COSTA NERY', 'SUZANA DOS SANTOS MONTELES', 'ANANITA BARBOSA DE ALMEIDA',
-            # Porto Grande
-            'VALMIR ANGELO MONTEIRO', 'GABRIELLE THAISSA PANTOJA DA SILVA', 'ANDRENA LIMA COSTA', 'ANNA RHAQUEL MARQUES MENEZES',
-            # Pracuúba
-            'ELSILEIDE PAIXÃO RAMOS', 'ADRIANA TAVARES LEAL', 'MAYCON BRIAN PASSOS COSTA', 'CARLOS RAIMUNDO PENHA FARIAS',
-            # Santana
-            'FRANCISCO RAIMUNDO RODRIGUES', 'CLELIA CARMEM BRAZIL DE OLIVEIRA', 'ALAÍSO NONATO GOMES', 'ISAAC BENICIO SILVA DE SOUZA',
-            'JOSÉ ALVES SILVA', 'JOYCE LOPES RODRIGUES', 'LIENE DA SILVA COSTA', 'ENIVALDO MAGNO CAMPOS',
-            # Tartarugalzinho
-            'MARCILENE SOUZA DA SILVA', 'EDNA VIANA DA SILVA', 'LILLIA GOMES CARDIM', 'MARIA ANTONIA SOUSA NOGUEIRA',
-            # Vitória do Jari
-            'FRANCISCO EDILSON DA SILVA CALDEIRA', 'ODACINEIDE DA COSTA SARGES', 'CAMILA DUTRA DA COSTA', 'CLEDIVANE CARDOSO DE FREITAS'
-        ],
-        'atendente': [
-            # Amapá
-            'LEILA BEATRIZ', 'LEILA BEATRIZ', 'BRENDA MONTEIRO', 'LEILA BEATRIZ',
-            'NAUINE MARTINS', 'RANUELY CAMPOS', 'NÃO INFORMADO', 'LEILA BEATRIZ',
-            'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ',
-            'LEILA BEATRIZ', 'LEILA BEATRIZ', 'BRENDA MONTEIRO', 'BRENDA MONTEIRO',
-            'NÃO INFORMADO', 'BRENDA MONTEIRO', 'BRENDA MONTEIRO', 'BRENDA MONTEIRO',
-            'BRENDA MONTEIRO', 'BRENDA MONTEIRO', 'BRENDA MONTEIRO', 'LEILA BEATRIZ',
-            'BRENDA MONTEIRO', 'LEILA BEATRIZ', 'ILETE BALIEIRO', 'NÃO INFORMADO',
-            'PEDRO LOBATO', 'PEDRO LOBATO', 'PEDRO LOBATO', 'PEDRO LOBATO',
-            'PEDRO LOBATO', 'PEDRO LOBATO', 'ILETE BALIEIRO', 'LEILA BEATRIZ',
-            'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ',
-            'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ',
-            'LEILA BEATRIZ', 'LEILA BEATRIZ',
-            # Calçoene
-            'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES',
-            'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES', 'LEILA BEATRIZ',
-            'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ',
-            # Cutias
-            'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS',
-            # Ferreira Gomes
-            'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ',
-            # Itaubal
-            'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS',
-            'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS',
-            # Laranjal do Jari
-            'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES',
-            # Macapá
-            'ADRIELE RODRIGUES', 'ADRIELE RODRIGUES', 'BRENDA MONTEIRO', 'JOSIVAN SILVA',
-            'JOSIVAN SILVA', 'JOSIVAN SILVA', 'FERNANDO SANTOS', 'FERNANDO SANTOS',
-            # Mazagão
-            'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES',
-            # Oiapoque
-            'NAUINE MARTINS', 'NAUINE MARTINS', 'NAUINE MARTINS', 'NAUINE MARTINS',
-            # Pedra Branca do Amapari
-            'EDSON GOMES', 'EDSON GOMES', 'ALESSANDRA GOMES', 'ALESSANDRA GOMES',
-            # Porto Grande
-            'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'BRENDA MONTEIRO',
-            # Pracuúba
-            'FERNANDO SANTOS', 'BRENDA MONTEIRO', 'ALESSANDRA GOMES', 'NÃO INFORMADO',
-            # Santana
-            'JOSIVAN SILVA', 'ADRIELE RODRIGUES', 'EDSON GOMES', 'JOSIVAN SILVA',
-            'NAUINE MARTINS', 'NAUINE MARTINS', 'JOSIVAN SILVA', 'JOSIVAN SILVA',
-            # Tartarugalzinho
-            'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS' ,
-            # Vitória do Jari
-            'LEILA BEATRIZ', 'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES'
-        ],
-        'municipio': [
-            'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá',
-            'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene', 'Calçoene',
-            'Cutias', 'Cutias', 'Cutias', 'Cutias',
-            'Ferreira Gomes', 'Ferreira Gomes', 'Ferreira Gomes', 'Ferreira Gomes',
-            'Itaubal', 'Itaubal', 'Itaubal', 'Itaubal', 'Itaubal', 'Itaubal', 'Itaubal', 'Itaubal',
-            'Laranjal do Jari', 'Laranjal do Jari', 'Laranjal do Jari', 'Laranjal do Jari',
-            'Macapá', 'Macapá', 'Macapá', 'Macapá', 'Macapá', 'Macapá', 'Macapá', 'Macapá',
-            'Mazagão', 'Mazagão', 'Mazagão', 'Mazagão',
-            'Oiapoque', 'Oiapoque', 'Oiapoque', 'Oiapoque',
-            'Pedra Branca do Amapari', 'Pedra Branca do Amapari', 'Pedra Branca do Amapari', 'Pedra Branca do Amapari',
-            'Porto Grande', 'Porto Grande', 'Porto Grande', 'Porto Grande',
-            'Pracuúba', 'Pracuúba', 'Pracuúba', 'Pracuúba',
-            'Santana', 'Santana', 'Santana', 'Santana', 'Santana', 'Santana', 'Santana', 'Santana',
-            'Tartarugalzinho', 'Tartarugalzinho', 'Tartarugalzinho', 'Tartarugalzinho',
-            'Vitória do Jari', 'Vitória do Jari', 'Vitória do Jari', 'Vitória do Jari'
-        ]
+def load_all_datasets():
+    # PLANILHA 1: Seus Dados (Base Geral)
+    seus_dados_raw = {
+        'Cliente': ['VANUBIA DOS SANTOS', 'RAIMUNDO CORREA', 'GIZELE SANTOS', 'RAIMUNDO CORREA', 'LIVIA CELIA', 'NICOLY PALHETA', 'ALERRANDRO BARBOSA', 'MANOEL CABRALZINHO', 'JORGE FELIPE', 'EMANUEL DAVY', 'LEONILSON CASTRO', 'ALINE VITORIA', 'BENEDITO COSTA', 'ALINE CRISTINA', 'HELIO LACERDA', 'EDIANE DA SILVA', 'LIA SILVA', 'SAMUEL YAGO', 'JOVANA DOS SANTOS', 'ROSIVAL RODRIGUES', 'PAULO DOS SANTOS', 'DECIZIENE FLEXA', 'ELIZEU DE SOUZA', 'DARCIVALDO DOS PASSOS', 'ANTONIO RODRIGUES', 'GLEICILENE DA SILVA', 'ÉVILI DE OLIVEIRA', 'RAIMUNDA CARDOSO', 'OSVALDO DO NASCIMENTO', 'RAYSSA DE ALMEIDA', 'GABRIEL ARCANJO', 'VALMIR ANGELO', 'GABRIELLE THAISSA', 'ELSILEIDE PAIXÃO', 'ADRIANA TAVARES', 'FRANCISCO RAIMUNDO', 'CLELIA CARMEM', 'MARCILENE SOUZA', 'EDNA VIANA', 'FRANCISCO EDILSON', 'ODACINEIDE DA COSTA'],
+        'Parceiro': ['HELLANA MEDEIROS', 'HELLANA MEDEIROS', 'HELLANA MEDEIROS', 'HELLANA MEDEIROS', 'EVERALDO PIRES', 'VALTINHO SANTANA', 'DILVANA', 'DILVANA', 'DILVANA', 'JOSÉ WALKER', 'JOSÉ WALKER', 'ANA BEATRIZ', 'ALCEMIRA TAVARES', 'ALCEMIRA TAVARES', 'ALCEMIRA TAVARES', 'JACTÃ', 'JACTÃ', 'FABIO', 'FABIO', 'TATIANE MORAES', 'MARIANE SILVA', 'NEURA', 'NEURA', 'MARIANE SANTOS', 'MARIANE SANTOS', 'TATIANE MORAES', 'TATIANE MORAES', 'KELTIANE MARQUES', 'KELTIANE MARQUES', 'MARIANE SILVA', 'MARIANE SILVA', 'JACKELINE BATISTA', 'JACKELINE BATISTA', 'FERNANDO SANTOS', 'RANUELY ESCRITÓRIO', 'TATIANE MORAES', 'ROSA INEZ', 'TAIS GOMES', 'TAIS GOMES', 'NEURA', 'NEURA'],
+        'Atendente': ['LEILA BEATRIZ', 'LEILA BEATRIZ', 'BRENDA MONTEIRO', 'LEILA BEATRIZ', 'NAUINE MARTINS', 'RANUELY CAMPOS', 'NÃO INFORMADO', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'EDSON GOMES', 'EDSON GOMES', 'EDSON GOMES', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'LEILA BEATRIZ', 'LEILA BEATRIZ', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'EDSON GOMES', 'EDSON GOMES', 'ADRIELE RODRIGUES', 'ADRIELE RODRIGUES', 'EDSON GOMES', 'EDSON GOMES', 'NAUINE MARTINS', 'NAUINE MARTINS', 'EDSON GOMES', 'EDSON GOMES', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'BRENDA MONTEIRO', 'JOSIVAN SILVA', 'ADRIELE RODRIGUES', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'LEILA BEATRIZ', 'EDSON GOMES'],
+        'Municipio': ['Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Amapá', 'Calçoene', 'Calçoene', 'Calçoene', 'Cutias', 'Cutias', 'Ferreira Gomes', 'Ferreira Gomes', 'Itaubal', 'Itaubal', 'Laranjal do Jari', 'Laranjal do Jari', 'Macapá', 'Macapá', 'Mazagão', 'Mazagão', 'Oiapoque', 'Oiapoque', 'Pedra Branca do Amapari', 'Pedra Branca do Amapari', 'Porto Grande', 'Porto Grande', 'Pracuúba', 'Pracuúba', 'Santana', 'Santana', 'Tartarugalzinho', 'Tartarugalzinho', 'Vitória do Jari', 'Vitória do Jari']
     }
-    
-    # Consolidação completa dos votos por Município (Extraído da planilha "urnas mapeadas")
+
+    # PLANILHA 2: Convertidos (Base Qualificada com Seção e Zona)
+    convertidos_raw = {
+        'Cliente': ['Tatiane Moraes', 'Margarida Moraes', 'Maria Antônia Ramos', 'Marciane Moraes', 'Sofia Moraes', 'tamires kevelim', 'edivania conceição', 'vitoria conceição', 'guilherme linho', 'tryla barros', 'antonio Santana lopes', 'ana maria da silva', 'josivan campos correa', 'maiara costa souza', 'mailom campos', 'nerivaldo maciel', 'elusley rezende', 'Iranilson da Silva', 'Pedro Paulo dos Santos', 'Civaldo Pacheco', 'Domingos Moraes', 'José Maria Moraes', 'Wellington Lemos', 'klever luan', 'Edson Gomes', 'Neuraci pereira', 'Lana Furtado', 'Neikson Nicolau', 'MARIA DO SOCORRO', 'OSVALDO QUEIROZ'],
+        'Parceiro': ['FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'ADRYELLY SILVA', 'ADRYELLY SILVA', 'ADRYELLY SILVA', 'ADRYELLY SILVA', 'ADRYELLY SILVA', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'SUELENE', 'SUELENE', 'ANE TOLOSA', 'ANE TOLOSA', 'ANE TOLOSA', 'JOSIVAN', 'JOSIVAN', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'EDSON', 'EDSON', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'AYENN TEIXEIRA', 'AYENN TEIXEIRA'],
+        'Atendente': ['FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'ADRYELLY SILVA', 'ADRYELLY SILVA', 'ADRYELLY SILVA', 'ADRYELLY SILVA', 'ADRYELLY SILVA', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'SUELENE', 'SUELENE', 'ANE TOLOSA', 'ANE TOLOSA', 'ANE TOLOSA', 'JOSIVAN', 'JOSIVAN', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'EDSON ', 'EDSON ', 'FERNANDO SANTOS', 'FERNANDO SANTOS', 'AYENN TEIXEIRA', 'AYENN TEIXEIRA'],
+        'Municipio': ['Macapá', 'Macapá', 'Macapá', 'Macapá', 'Macapá', 'Santana', 'Santana', 'Santana', 'Santana', 'Santana', 'Santana', 'Santana', 'Tartarugalzinho', 'Tartarugalzinho', 'Tartarugalzinho', 'Tartarugalzinho', 'Tartarugalzinho', 'Itaubal', 'Itaubal', 'Itaubal', 'Macapá', 'Macapá', 'Macapá', 'Macapá', 'Laranjal do Jari', 'Laranjal do Jari', 'Mazagão', 'Mazagão', 'Macapá', 'Macapá']
+    }
+
+    # PLANILHA 3: Urnas Mapeadas (Teto Eleitoral Oficial)
     urnas_raw = [
-        {'municipio': 'amapá', 'marcio': 19, 'liliane': 5, 'acácio': 56},
-        {'municipio': 'calçoene', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'cutias', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'ferreiragomes', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
-        {'municipio': 'laranjaldojari', 'marcio': 8991, 'liliane': 0, 'acácio': 4518},
-        {'municipio': 'macapá', 'marcio': 6328, 'liliane': 3862, 'acácio': 68171},
-        {'municipio': 'mazagão', 'marcio': 9545, 'liliane': 342, 'acácio': 78},
-        {'municipio': 'oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'pedrabrancadoamapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'portogrande', 'marcio': 1, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'santana', 'marcio': 32, 'liliane': 6, 'acácio': 394},
-        {'municipio': 'tartarugalzinho', 'marcio': 216, 'liliane': 1512, 'acácio': 952},
-        {'municipio': 'vitória do jari', 'marcio': 29, 'liliane': 2, 'acácio': 151}
+        {'municipio': 'Itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
+        {'municipio': 'Macapá', 'marcio': 89, 'liliane': 49, 'acácio': 1141},
+        {'municipio': 'Santana', 'marcio': 4, 'liliane': 3, 'acácio': 197},
+        {'municipio': 'Tartarugalzinho', 'marcio': 133, 'liliane': 994, 'acácio': 602},
+        {'municipio': 'Laranjal do jari', 'marcio': 22, 'liliane': 0, 'acácio': 70},
+        {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38, 'acácio': 3479},
+        {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26, 'acácio': 1545},
+        {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545}
     ]
+
+    df_sd = pd.DataFrame(seus_dados_raw)
+    df_cv = pd.DataFrame(convertidos_raw)
+    df_ur = pd.DataFrame(urnas_raw)
+
+    for df in [df_sd, df_cv, df_ur]:
+        df['municipio_id'] = df['Municipio' if 'Municipio' in df.columns else 'municipio'].str.lower().str.strip()
     
-    df1 = pd.DataFrame(clients_raw)
-    df2 = pd.DataFrame(urnas_raw)
-    
-    # Higienização de strings para compatibilidade matemática de joins e buscas
-    df1['municipio_id'] = df1['municipio'].str.lower().str.replace(" ", "").str.strip()
-    df2['municipio_id'] = df2['municipio'].str.lower().str.replace(" ", "").str.strip()
-    df1['atendente'] = df1['atendente'].str.upper().str.strip()
-    
-    return df1, df2
+    df_sd['atendente_id'] = df_sd['Atendente'].str.upper().str.strip()
+    df_cv['atendente_id'] = df_cv['Atendente'].str.upper().str.strip()
+    df_sd['parceiro_id'] = df_sd['Parceiro'].str.upper().str.strip()
+    df_cv['parceiro_id'] = df_cv['Parceiro'].str.upper().str.strip()
 
-df_clients, df_urnas = load_and_clean_data()
+    return df_sd, df_cv, df_ur
 
-# 3. Componente Lateral de Filtragem Dinâmica
-st.sidebar.header("🎯 Parâmetros Analíticos")
-all_municipios = sorted(df_clients['municipio'].unique())
-selected_municipio = st.sidebar.selectbox("Selecione o Município:", all_municipios)
+df_seus_dados, df_convertidos, df_urnas = load_all_datasets()
 
-# Resolução das chaves relacionais indexadas
-selected_id = selected_municipio.lower().replace(" ", "").strip()
-df_c_filtered = df_clients[df_clients['municipio_id'] == selected_id]
-df_u_filtered = df_urnas[df_urnas['municipio_id'] == selected_id]
+# 3. Sidebar de Governança e Filtros Hierárquicos
+st.sidebar.header("🎯 Filtros do Sistema")
 
-# 4. Motor de Distribuição Proporcional Pro-Rata
-total_clientes_mun = len(df_c_filtered)
-votos_marcio = df_u_filtered['marcio'].sum() if not df_u_filtered.empty else 0
-votos_liliane = df_u_filtered['liliane'].sum() if not df_u_filtered.empty else 0
-votos_acacio = df_u_filtered['acácio'].sum() if not df_u_filtered.empty else 0
-total_votos_mun = votos_marcio + votos_liliane + votos_acacio
+list_municipios = sorted(df_urnas['municipio_id'].unique())
+sel_municipio = st.sidebar.selectbox("1. Selecione o Município Alvo:", list_municipios, index=list_municipios.index('amapá') if 'amapá' in list_municipios else 0)
 
-atendente_counts = df_c_filtered['atendente'].value_counts()
-atendente_data = []
+df_sd_m = df_seus_dados[df_seus_dados['municipio_id'] == sel_municipio]
+df_cv_m = df_convertidos[df_convertidos['municipio_id'] == sel_municipio]
 
-for atendente, count in atendente_counts.items():
-    proporcao = count / total_clientes_mun if total_clientes_mun > 0 else 0
-    atendente_data.append({
-        'Atendente': atendente,
-        'Clientes Cadastrados': count,
-        'Marcio (Estimado)': int(votos_marcio * proporcao),
-        'Liliane (Estimado)': int(votos_liliane * proporcao),
-        'Acácio (Estimado)': int(votos_acacio * proporcao),
-        'Total Estimado': int(total_votos_mun * proporcao)
-    })
+list_atendentes = sorted(list(set(df_sd_m['atendente_id'].unique()) | set(df_cv_m['atendente_id'].unique())))
+list_atendentes.insert(0, "TODOS")
+sel_atendente = st.sidebar.selectbox("2. Filtrar por Atendente:", list_atendentes)
 
-df_performance = pd.DataFrame(atendente_data)
+list_parceiros = sorted(list(set(df_sd_m['parceiro_id'].unique()) | set(df_cv_m['parceiro_id'].unique())))
+list_parceiros.insert(0, "TODOS")
+sel_parceiro = st.sidebar.selectbox("3. Filtrar por Parceiro / Apontador:", list_parceiros)
 
-# 5. Dashboard Executivo - Indicadores de Performance (KPIs)
-st.subheader(f"📈 Panorama Estrutural - {selected_municipio.upper()}")
-kpi1, kpi2, kpi3 = st.columns(3)
-with kpi1:
-    st.metric("Clientes Ativos Mapeados", f"{total_clientes_mun} u")
-with kpi2:
-    st.metric("Votos Consolidados nas Urnas", f"{total_votos_mun} votos")
-with kpi3:
-    indice = (total_clientes_mun / total_votos_mun * 100) if total_votos_mun > 0 else 0
-    st.metric("Taxa de Penetração Comercial", f"{indice:.2f}%" if total_votos_mun > 0 else "0.00% (Sem Votos)")
+if sel_atendente != "TODOS":
+    df_sd_m = df_sd_m[df_sd_m['atendente_id'] == sel_atendente]
+    df_cv_m = df_cv_m[df_cv_m['atendente_id'] == sel_atendente]
+
+if sel_parceiro != "TODOS":
+    df_sd_m = df_sd_m[df_sd_m['parceiro_id'] == sel_parceiro]
+    df_cv_m = df_cv_m[df_cv_m['parceiro_id'] == sel_parceiro]
+
+# 5. Consolidação de Votos do Município (Urna Oficial)
+df_urnas_sel = df_urnas[df_urnas['municipio_id'] == sel_municipio]
+votos_marcio = int(df_urnas_sel['marcio'].sum()) if not df_urnas_sel.empty else 0
+votos_liliane = int(df_urnas_sel['liliane'].sum()) if not df_urnas_sel.empty else 0
+votos_acacio = int(df_urnas_sel['acácio'].sum()) if not df_urnas_sel.empty else 0
+total_votos_municipio = votos_marcio + votos_liliane + votos_acacio
+
+# 6. Painel Executivo de Indicadores (KPIs com Índices de Aproveitamento)
+st.subheader(f"📊 Desempenho Analítico — {sel_municipio.upper()}")
+c1, k_m, k_sd, k_cv = st.columns(4)
+
+count_seus_dados = len(df_sd_m)
+count_convertidos = len(df_cv_m)
+
+with c1:
+    st.metric("Votos Totais Computados", f"{total_votos_municipio} v")
+with k_m:
+    st.metric("Teto Oficial Urna (Candidatos)", f"{total_votos_municipio} votos")
+with k_sd:
+    aprov_sd = (count_seus_dados / total_votos_municipio * 100) if total_votos_municipio > 0 else 0
+    st.metric("Mapeados (Seus Dados)", f"{count_seus_dados} u", f"Aprov: {aprov_sd:.2f}%")
+with k_cv:
+    aprov_cv = (count_convertidos / total_votos_municipio * 100) if total_votos_municipio > 0 else 0
+    st.metric("Mapeados (Convertidos)", f"{count_convertidos} u", f"Aprov: {aprov_cv:.2f}%")
 
 st.markdown("---")
 
-# 6. Mapeamento Matricial - Mapa de Calor HTML/CSS Inline (Segurança Total)
-st.subheader("🔥 Mapa de Calor Eleitoral: Atendentes x Candidatos")
-if not df_performance.empty and total_votos_mun > 0:
-    df_heat = df_performance[['Atendente', 'Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']].copy()
-    
-    max_val = df_heat[['Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']].max().max()
-    if max_val == 0: max_val = 1
+# 7. Renderização do Gráfico Dinâmico de Manchas Concêntricas (HTML/CSS Autônomo)
+st.subheader("🔥 Mapa de Calor Eleitoral: Distribution Geometrica das Manchas")
 
-    html_table = "<table style='width:100%; border-collapse: collapse; font-family: sans-serif; text-align: center;'>"
-    html_table += "<tr style='background-color: #f4f4f4; color: #333; font-weight: bold;'>"
-    html_table += "<th style='padding: 12px; border: 1px solid #ddd;'>Atendente</th>"
-    html_table += "<th style='border: 1px solid #ddd;'>Marcio</th>"
-    html_table += "<th style='border: 1px solid #ddd;'>Liliane</th>"
-    html_table += "<th style='border: 1px solid #ddd;'>Acácio</th>"
-    html_table += "</tr>"
-    
-    for _, row in df_heat.iterrows():
-        html_table += f"<tr><td style='padding: 12px; font-weight: bold; border: 1px solid #ddd; background-color: #fafafa;'>{row['Atendente']}</td>"
-        for cand in ['Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)']:
-            val = row[cand]
-            alpha = (val / max_val) * 0.85
-            html_table += f"<td style='border: 1px solid #ddd; background-color: rgba(220, 53, 69, {alpha:.2f}); color: {'#000' if alpha < 0.4 else '#fff'}; font-weight: bold;'>{val}</td>"
-        html_table += "</tr>"
-    html_table += "</table>"
-    
-    st.write(html_table, unsafe_allow_html=True)
+if total_votos_municipio > 0:
+    max_box_width = 100
+    width_sd = min(max_box_width, max(15, int((count_seus_dados / total_votos_municipio) * 100))) if count_seus_dados > 0 else 5
+    width_cv = min(max_box_width, max(10, int((count_convertidos / total_votos_municipio) * 100))) if count_convertidos > 0 else 5
+
+    manchas_html = f"""
+    manchas_html = f"""
+    <div style='display: flex; flex-direction: column; gap: 20px; width: 100%; padding: 15px; background: #111; border-radius: 8px;'>
+        <div style='width: 100%; background: rgba(220, 53, 69, 0.9); color: white; padding: 25px; border-radius: 6px; font-family: sans-serif;'>
+            <span style='font-size: 14px; text-transform: uppercase; font-weight: bold;'>⚫ MANCHA 1: Urnas Mapeadas</span>
+            <h2 style='margin: 5px 0 0 0; color: white;'>{total_votos_municipio} Votos Reais</h2>
+            <p style='margin: 5px 0 0 0; font-size:13px; opacity:0.8;'>Marcio: {votos_marcio} | Liliane: {votos_liliane} | Acácio: {votos_acacio}</p>
+        </div>
+        <div style='width: {width_sd}%; min-width: 250px; background: rgba(255, 193, 7, 0.9); color: black; padding: 20px; border-radius: 6px; font-family: sans-serif;'>
+            <span style='font-size: 13px; text-transform: uppercase; font-weight: bold;'>🟡 MANCHA 2: Seus Dados</span>
+            <h3 style='margin: 5px 0 0 0; color: black;'>{count_seus_dados} Clientes</h3>
+            <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;'>Aproveitamento: {aprov_sd:.2f}%</span>
+        </div>
+        <div style='width: {width_cv}%; min-width: 200px; background: rgba(40, 167, 69, 0.9); color: white; padding: 18px; border-radius: 6px; font-family: sans-serif;'>
+            <span style='font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>🟢 MANCHA 3: Convertidos</span>
+            <h4 style='margin: 5px 0 0 0; color: white;'>{count_convertidos} Clientes</h4>
+            <span style='background: white; color: #28a745; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;'>Aproveitamento Final: {aprov_cv:.2f}%</span>
+        </div>
+    </div>
+    """
+    st.write(manchas_html, unsafe_allow_html=True)
 else:
-    st.info(f"O município de {selected_municipio.upper()} não possui histórico de votação mapeado ou o volume de votos nas seções é zero.")
+    st.info("O município ativo não possui registros ou votos computados nas Urnas Mapeadas.")
 
 st.markdown("---")
 
-# 7. Ranking de Performance Geral e Filtros por Alvo
-st.subheader("🏆 Ranking de Conversão por Atendente")
-if not df_performance.empty:
-    selected_candidato = st.selectbox("Selecione o Candidato para Filtrar o Ranking:", ['Total Estimado', 'Marcio (Estimado)', 'Liliane (Estimado)', 'Acácio (Estimado)'])
-    
-    df_performance['% Proporção sobre as Urnas'] = (df_performance[selected_candidato] / total_votos_mun * 100).round(2) if total_votos_mun > 0 else 0
-    ranking_final = df_performance[['Atendente', 'Clientes Cadastrados', selected_candidato, '% Proporção sobre as Urnas']]
-    
-    st.dataframe(ranking_final.sort_values(by=selected_candidato, ascending=False), use_container_width=True)
+# 8. Tabela de Consolidação Cruzada dos Candidatos por Município
+st.subheader("🏆 Detalhamento de Votos Oficiais por Município")
+df_urnas_display = df_urnas[['municipio', 'marcio', 'liliane', 'acácio']].copy()
+df_urnas_display.columns = ['Município', 'Votos Marcio', 'Votos Liliane', 'Votos Acácio']
+st.dataframe(df_urnas_display, use_container_width=True)
+
+# 9. FERRAMENTA DE BACKUP INTEGRADA (Gerador de download interno do código fonte)
+st.sidebar.markdown("---")
+st.sidebar.subheader("💾 Backup do Código Fonte")
+with open(__file__, "r", encoding="utf-8") as f:
+    source_code = f.read()
+
+st.sidebar.download_button(
+    label="📥 Descarregar arquivo .py",
+    data=source_code,
+    file_name="app.py",
+    mime="text/x-python"
+)
