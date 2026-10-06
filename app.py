@@ -317,12 +317,12 @@ if teto_urnas > 0:
         </div>
         <div style='width: {w_da}%; min-width: 250px; background: rgba(255, 193, 7, 0.9); color: black; padding: 20px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 13px; text-transform: uppercase; font-weight: bold;'>&#128993; MANCHA 2: Volume Dados Análise</span>
-            <h3 style='margin: 5px 0 0 0; color: black;'>{votos_dados_analise} Votos Mapeados</h3>
+            <h3 style='margin: 5px 0 0 0; color: black;'>{votos_dados_analise} Teto de votos</h3>
             <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px;'>Eficiência: {p_da_str}</span>
         </div>
         <div style='width: {w_cv}%; min-width: 200px; background: rgba(40, 167, 69, 0.9); color: white; padding: 18px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>&#128994; MANCHA 3: Desempenho Convertidos</span>
-            <h4 style='margin: 5px 0 0 0; color: white;'>{votos_convertidos} Votos Qualificados</h4>
+            <h4 style='margin: 5px 0 0 0; color: white;'>{votos_convertidos} Colmeias</h4>
             <span style='background: white; color: #28a745; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 5px;'>Conversão Real: {p_cv_str}</span>
         </div>
     </div>
