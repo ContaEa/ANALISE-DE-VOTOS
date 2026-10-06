@@ -116,7 +116,10 @@ if total_votos_municipio > 0:
     width_sd = min(max_box_width, max(15, int((count_seus_dados / total_votos_municipio) * 100))) if count_seus_dados > 0 else 5
     width_cv = min(max_box_width, max(10, int((count_convertidos / total_votos_municipio) * 100))) if count_convertidos > 0 else 5
 
-    manchas_html = f"""
+    # Strings de percentagem com aspas simples internas para evitar conflitos na f-string
+    p_sd_str = f"{aprov_sd:.2f}%"
+    p_cv_str = f"{aprov_cv:.2f}%"
+
     manchas_html = f"""
     <div style='display: flex; flex-direction: column; gap: 20px; width: 100%; padding: 15px; background: #111; border-radius: 8px;'>
         <div style='width: 100%; background: rgba(220, 53, 69, 0.9); color: white; padding: 25px; border-radius: 6px; font-family: sans-serif;'>
@@ -127,12 +130,12 @@ if total_votos_municipio > 0:
         <div style='width: {width_sd}%; min-width: 250px; background: rgba(255, 193, 7, 0.9); color: black; padding: 20px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 13px; text-transform: uppercase; font-weight: bold;'>&#128993; MANCHA 2: Seus Dados</span>
             <h3 style='margin: 5px 0 0 0; color: black;'>{count_seus_dados} Clientes</h3>
-            <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px;'>Aproveitamento: {aprov_sd:.2f}%</span>
+            <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px;'>Aproveitamento: {p_sd_str}</span>
         </div>
         <div style='width: {width_cv}%; min-width: 200px; background: rgba(40, 167, 69, 0.9); color: white; padding: 18px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>&#128994; MANCHA 3: Convertidos</span>
             <h4 style='margin: 5px 0 0 0; color: white;'>{count_convertidos} Clientes</h4>
-            <span style='background: white; color: #28a745; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 5px;'>Aproveitamento Final: {aprov_cv:.2f}%</span>
+            <span style='background: white; color: #28a745; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 5px;'>Aproveitamento Final: {p_cv_str}</span>
         </div>
     </div>
     """
