@@ -292,7 +292,7 @@ else:
 
 if map_records:
     df_map = pd.DataFrame(map_records)
-    # Correção crucial do parâmetro "size" para evitar erros JSON no DeckGL Chart
+    # Correção do parâmetro size para evitar erros JSON no DeckGL Chart
     st.map(df_map, latitude='latitude', longitude='longitude', size='votos')
 else:
     st.info("Coordenadas geográficas indisponíveis para o escopo atual.")
@@ -307,6 +307,7 @@ if teto_urnas > 0:
     w_da = min(max_width, max(15, int((votos_dados_analise / teto_urnas) * 100))) if votos_dados_analise > 0 else 5
     w_cv = min(max_width, max(10, int((votos_convertidos / teto_urnas) * 100))) if votos_convertidos > 0 else 5
 
+    # Strings de percentagem formatadas com aspas simples para eliminar o SyntaxError
     p_da_str = f"{aprov_da:.2f}%"
     p_cv_str = f"{aprov_cv:.2f}%"
 
@@ -354,8 +355,6 @@ with open(__file__, "r", encoding="utf-8") as f:
     source_code = f.read()
 
 st.sidebar.download_button(
-    label="📥 Descarregar arquivo .py",
-    data=source_code,
 st.sidebar.download_button(
     label="📥 Descarregar arquivo .py",
     data=source_code,
