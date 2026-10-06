@@ -9,7 +9,7 @@ st.title("🎯 Painel Analítico de BI - Aproveitamento de Votos por Manchas")
 st.markdown("Análise de penetração e conversão de bases cadastrais sobre o total de votos apurados por município.")
 st.markdown("---")
 
-# 2. Pipeline de Dados Integrado e Higienizado (Dados Reais das 3 Planilhas)
+# 2. Pipeline de Dados Integrado e Higienizado (Dados Reais das Planilhas)
 @st.cache_data
 def load_all_datasets():
     # PLANILHA 1: Seus Dados (Base Geral)
@@ -59,20 +59,32 @@ df_seus_dados, df_convertidos, df_urnas = load_all_datasets()
 # 3. Sidebar de Governança e Filtros Hierárquicos
 st.sidebar.header("🎯 Filtros do Sistema")
 
+# Filtro 1: Município (Agora incluindo a opção TODOS)
 list_municipios = sorted(df_urnas['municipio_id'].unique())
-sel_municipio = st.sidebar.selectbox("1. Selecione o Município Alvo:", list_municipios, index=list_municipios.index('amapá') if 'amapá' in list_municipios else 0)
+list_municipios.insert(0, "todos")
+sel_municipio = st.sidebar.selectbox("1. Selecione o Município Alvo:", list_municipios, index=0)
 
-df_sd_m = df_seus_dados[df_seus_dados['municipio_id'] == sel_municipio]
-df_cv_m = df_convertidos[df_convertidos['municipio_id'] == sel_municipio]
+# Escopo Inicial baseado no Município selecionado
+if sel_municipio == "todos":
+    df_sd_m = df_seus_dados.copy()
+    df_cv_m = df_convertidos.copy()
+    df_urnas_sel = df_urnas.copy()
+else:
+    df_sd_m = df_seus_dados[df_seus_dados['municipio_id'] == sel_municipio]
+    df_cv_m = df_convertidos[df_convertidos['municipio_id'] == sel_municipio]
+    df_urnas_sel = df_urnas[df_urnas['municipio_id'] == sel_municipio]
 
+# Filtro 2: Atendente
 list_atendentes = sorted(list(set(df_sd_m['atendente_id'].unique()) | set(df_cv_m['atendente_id'].unique())))
 list_atendentes.insert(0, "TODOS")
 sel_atendente = st.sidebar.selectbox("2. Filtrar por Atendente:", list_atendentes)
 
+# Filtro 3: Parceiro
 list_parceiros = sorted(list(set(df_sd_m['parceiro_id'].unique()) | set(df_cv_m['parceiro_id'].unique())))
 list_parceiros.insert(0, "TODOS")
 sel_parceiro = st.sidebar.selectbox("3. Filtrar por Parceiro / Apontador:", list_parceiros)
 
+# 4. Aplicação Dinâmica dos Filtros sobre as Manchas de Captação
 if sel_atendente != "TODOS":
     df_sd_m = df_sd_m[df_sd_m['atendente_id'] == sel_atendente]
     df_cv_m = df_cv_m[df_cv_m['atendente_id'] == sel_atendente]
@@ -81,11 +93,10 @@ if sel_parceiro != "TODOS":
     df_sd_m = df_sd_m[df_sd_m['parceiro_id'] == sel_parceiro]
     df_cv_m = df_cv_m[df_cv_m['parceiro_id'] == sel_parceiro]
 
-# 5. Consolidação de Votos do Município (Urna Oficial)
-df_urnas_sel = df_urnas[df_urnas['municipio_id'] == sel_municipio]
-votos_marcio = int(df_urnas_sel['marcio'].sum()) if not df_urnas_sel.empty else 0
-votos_liliane = int(df_urnas_sel['liliane'].sum()) if not df_urnas_sel.empty else 0
-votos_acacio = int(df_urnas_sel['acácio'].sum()) if not df_urnas_sel.empty else 0
+# 5. Consolidação de Votos Eleitorais
+votos_marcio = int(df_urnas_sel['marcio'].sum())
+votos_liliane = int(df_urnas_sel['liliane'].sum())
+votos_acacio = int(df_urnas_sel['acácio'].sum())
 total_votos_municipio = votos_marcio + votos_liliane + votos_acacio
 
 # 6. Painel Executivo de Indicadores (KPIs com Índices de Aproveitamento)
@@ -116,7 +127,7 @@ if total_votos_municipio > 0:
     width_sd = min(max_box_width, max(15, int((count_seus_dados / total_votos_municipio) * 100))) if count_seus_dados > 0 else 5
     width_cv = min(max_box_width, max(10, int((count_convertidos / total_votos_municipio) * 100))) if count_convertidos > 0 else 5
 
-    # Strings de percentagem com aspas simples internas para evitar conflitos na f-string
+    # Isolamento de strings de percentagem com aspas simples para eliminar o SyntaxError
     p_sd_str = f"{aprov_sd:.2f}%"
     p_cv_str = f"{aprov_cv:.2f}%"
 
