@@ -9,7 +9,7 @@ st.title("📊 Painel Analítico de BI - Cruzamento de Manchas e Conversão Elei
 st.markdown("Monitorização de penetração das bases cadastrais consolidadas face aos votos oficiais apurados em urna.")
 st.markdown("---")
 
-# 2. Pipeline de Dados Integrado (Carga Direta das 3 Novas Planilhas)
+# 2. Pipeline de Dados Integrado (Carga Direta das 3 Novas Planilhas Completas)
 @st.cache_data
 def load_and_consolidate_datasets():
     # PLANILHA 1: Dados Análise (Base Cadastral Geral)
@@ -152,6 +152,17 @@ def load_and_consolidate_datasets():
         {'mun': 'Vitória do Jari', 'atend': 'LEANDRO DOS SANTOS SILVA', 'votos': 15}
     ]
 
+    urnas_raw = [
+        {'municipio': 'Itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
+        {'municipio': 'Macapá', 'marcio': 89, 'liliane': 49, 'acácio': 1141},
+        {'municipio': 'Santana', 'marcio': 4, 'liliane': 3, 'acácio': 197},
+        {'municipio': 'Tartarugalzinho', 'marcio': 133, 'liliane': 994, 'acácio': 602},
+        {'municipio': 'Laranjal do Jari', 'marcio': 22, 'liliane': 0, 'acácio': 70},
+        {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38, 'acácio': 3479},
+        {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26, 'acácio': 1545},
+        {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545}
+    ]
+
     df_da = pd.DataFrame(dados_analise_raw)
     df_cv = pd.DataFrame(convertidos_raw)
     df_ur = pd.DataFrame(urnas_raw)
@@ -190,7 +201,7 @@ list_atendentes = sorted(list(set(df_da_f['atend_id'].unique()) | set(df_cv_f['a
 list_atendentes.insert(0, "TODOS")
 sel_atendente = st.sidebar.selectbox("2. Gestor Operacional (Atendente):", list_atendentes, index=0)
 
-# Filtro 3: Candidatos Alvo (Marcos/Marcio, Liliane, Acácio)
+# Filtro 3: Candidatos Alvo (Marcio, Liliane, Acácio)
 sel_candidato = st.sidebar.selectbox("3. Candidato Alvo (Filtro Urna):", ["TODOS", "Marcio", "Liliane", "Acácio"], index=0)
 
 # Aplicação dinâmica das regras de filtragem de Atendente
@@ -238,6 +249,7 @@ if teto_urnas > 0:
     w_da = min(max_width, max(15, int((votos_dados_analise / teto_urnas) * 100))) if votos_dados_analise > 0 else 5
     w_cv = min(max_width, max(10, int((votos_convertidos / teto_urnas) * 100))) if votos_convertidos > 0 else 5
 
+    # Strings de percentagem formatadas isoladamente para evitar conflitos na f-string
     p_da_str = f"{aprov_da:.2f}%"
     p_cv_str = f"{aprov_cv:.2f}%"
 
@@ -254,7 +266,7 @@ if teto_urnas > 0:
             <span style='background: black; color: #ffc107; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-top: 5px;'>Eficiência: {p_da_str}</span>
         </div>
         <div style='width: {w_cv}%; min-width: 200px; background: rgba(40, 167, 69, 0.9); color: white; padding: 18px; border-radius: 6px; font-family: sans-serif;'>
-            <span style='font-size: 12px; text-transform: uppercase; font-weight: bold;'>&#128994; MANCHA 3: Desempenho Convertidos</span>
+            <span style='font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>&#128994; MANCHA 3: Desempenho Convertidos</span>
             <h4 style='margin: 5px 0 0 0; color: white;'>{votos_convertidos} Votos Qualificados</h4>
             <span style='background: white; color: #28a745; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 5px;'>Conversão Real: {p_cv_str}</span>
         </div>
