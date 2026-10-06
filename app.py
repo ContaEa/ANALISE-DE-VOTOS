@@ -1,7 +1,17 @@
+import os
+import subprocess
+import sys
+
+# Mecanismo de contingência: força a instalação do Plotly caso o ambiente falhe
+try:
+    import plotly.express as px
+except ModuleNotFoundError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "plotly"])
+    import plotly.express as px
+
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
 
 # 1. Configuração da Página do Streamlit
 st.set_page_config(page_title="Analytics Eleitoral - Amapá", layout="wide", page_icon="🗳️")
