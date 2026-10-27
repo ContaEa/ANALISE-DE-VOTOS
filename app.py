@@ -2,17 +2,14 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# 1. Configuração de Layout e Janela do Navegador
 st.set_page_config(page_title="BI Eleitoral - Análise de Manchas", layout="wide", page_icon="🗳️")
 
 st.title("📊 Painel Analítico de BI - Cruzamento de Manchas e Conversão Eleitoral")
 st.markdown("Monitorização de penetração das bases cadastrais consolidadas face aos votos oficiais apurados em urna.")
 st.markdown("---")
 
-# 2. Pipeline de Dados Integrado (Carga Direta das 3 Novas Planilhas Completas)
 @st.cache_data
 def load_and_consolidate_datasets():
-    # PLANILHA 1: Dados Análise (Base Cadastral Geral)
     dados_analise_raw = [
         {'mun': 'Amapá', 'atend': 'BRENDA MONTEIRO', 'votos': 13},
         {'mun': 'Amapá', 'atend': 'ILETE BALIEIRO', 'votos': 2},
@@ -123,7 +120,6 @@ def load_and_consolidate_datasets():
         {'mun': 'Vitória do Jari', 'atend': 'PEDRO LOBATO', 'votos': 1}
     ]
 
-    # PLANILHA 2: Análise Convertidos (Base Qualificada de Última Milha)
     convertidos_raw = [
         {'mun': 'Amapá', 'atend': 'RAY', 'votos': 2},
         {'mun': 'Itaubal', 'atend': 'ADELSON', 'votos': 10},
@@ -153,28 +149,27 @@ def load_and_consolidate_datasets():
     ]
 
     urnas_raw = [
-        {'municipio': 'Itaubal', 'marcio': 134, 'liliane': 66, 'acácio': 1333},
-        {'municipio': 'Macapá', 'marcio': 89, 'liliane': 49, 'acácio': 1141},
-        {'municipio': 'Santana', 'marcio': 4, 'liliane': 3, 'acácio': 197},
-        {'municipio': 'Tartarugalzinho', 'marcio': 133, 'liliane': 994, 'acácio': 602},
-        {'municipio': 'Laranjal do Jari', 'marcio': 22, 'liliane': 0, 'acácio': 70},
-        {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38, 'acácio': 3479},
-        {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26, 'acácio': 1545},
-        {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78, 'acácio': 9545},
-        {'municipio': 'Calçoene', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Cutias', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Ferreira Gomes', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Oiapoque', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Pedra Branca do Amapari', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Pracuúba', 'marcio': 0, 'liliane': 0, 'acácio': 0},
-        {'municipio': 'Serra do Navio', 'marcio': 0, 'liliane': 0, 'acácio': 0}
+        {'municipio': 'Itaubal', 'marcio': 134, 'liliane': 66},
+        {'municipio': 'Macapá', 'marcio': 89, 'liliane': 49},
+        {'municipio': 'Santana', 'marcio': 4, 'liliane': 3},
+        {'municipio': 'Tartarugalzinho', 'marcio': 133, 'liliane': 994},
+        {'municipio': 'Laranjal do Jari', 'marcio': 22, 'liliane': 0},
+        {'municipio': 'Porto Grande', 'marcio': 365, 'liliane': 38},
+        {'municipio': 'Amapá', 'marcio': 555, 'liliane': 26},
+        {'municipio': 'Mazagão', 'marcio': 342, 'liliane': 78},
+        {'municipio': 'Calçoene', 'marcio': 0, 'liliane': 0},
+        {'municipio': 'Cutias', 'marcio': 0, 'liliane': 0},
+        {'municipio': 'Ferreira Gomes', 'marcio': 0, 'liliane': 0},
+        {'municipio': 'Oiapoque', 'marcio': 0, 'liliane': 0},
+        {'municipio': 'Pedra Branca do Amapari', 'marcio': 0, 'liliane': 0},
+        {'municipio': 'Pracuúba', 'marcio': 0, 'liliane': 0},
+        {'municipio': 'Serra do Navio', 'marcio': 0, 'liliane': 0}
     ]
 
     df_da = pd.DataFrame(dados_analise_raw)
     df_cv = pd.DataFrame(convertidos_raw)
     df_ur = pd.DataFrame(urnas_raw)
 
-    # Padronização de strings indexadas para chaves estáveis
     for df in [df_da, df_cv]:
         df['mun_id'] = df['mun'].str.lower().str.replace(" ", "").str.strip()
         df['atend_id'] = df['atend'].str.upper().str.strip()
@@ -184,15 +179,12 @@ def load_and_consolidate_datasets():
 
 df_dados_analise, df_convertidos, df_urnas = load_and_consolidate_datasets()
 
-# 3. Sidebar de Governança Estrita - Filtros Globais com "TODOS"
 st.sidebar.header("🎯 Governança Eleitoral")
 
-# Filtro 1: Município
 list_municipios = sorted(list(df_urnas['municipio'].unique()))
 list_municipios.insert(0, "TODOS")
 sel_municipio = st.sidebar.selectbox("1. Escopo Geográfico (Município):", list_municipios, index=0)
 
-# Resolução de escopo baseado na seleção do município
 m_id = sel_municipio.lower().replace(" ", "").strip()
 if sel_municipio == "TODOS":
     df_da_f = df_dados_analise.copy()
@@ -203,37 +195,29 @@ else:
     df_cv_f = df_convertidos[df_convertidos['mun_id'] == m_id]
     df_ur_f = df_urnas[df_urnas['mun_id'] == m_id]
 
-# Filtro 2: Atendente
 list_atendentes = sorted(list(set(df_da_f['atend_id'].unique()) | set(df_cv_f['atend_id'].unique())))
 list_atendentes.insert(0, "TODOS")
 sel_atendente = st.sidebar.selectbox("2. Gestor Operacional (Atendente):", list_atendentes, index=0)
 
-# Filtro 3: Candidatos Alvo (Marcio, Liliane, Acácio)
-sel_candidato = st.sidebar.selectbox("3. Candidato Alvo (Filtro Urna):", ["TODOS", "Marcio", "Liliane", "Acácio"], index=0)
+sel_candidato = st.sidebar.selectbox("3. Candidato Alvo (Filtro Urna):", ["TODOS", "Marcio", "Liliane"], index=0)
 
-# Aplicação dinâmica das regras de filtragem de Atendente
 if sel_atendente != "TODOS":
     df_da_f = df_da_f[df_da_f['atend_id'] == sel_atendente]
     df_cv_f = df_cv_f[df_cv_f['atend_id'] == sel_atendente]
 
-# 4. Processamento Teórico das Manchas
 votos_marcio = int(df_ur_f['marcio'].sum())
 votos_liliane = int(df_ur_f['liliane'].sum())
-votos_acacio = int(df_ur_f['acácio'].sum())
 
 if sel_candidato == "Marcio":
     teto_urnas = votos_marcio
 elif sel_candidato == "Liliane":
     teto_urnas = votos_liliane
-elif sel_candidato == "Acácio":
-    teto_urnas = votos_acacio
 else:
-    teto_urnas = votos_marcio + votos_liliane + votos_acacio
+    teto_urnas = votos_marcio + votos_liliane
 
 votos_dados_analise = int(df_da_f['votos'].sum())
 votos_convertidos = int(df_cv_f['votos'].sum())
 
-# 5. Painel Geral de Métricas e KPIs
 st.subheader(f"📈 Sumário Operacional Executivo — {sel_municipio.upper()}")
 k1, k2, k3 = st.columns(3)
 
@@ -248,10 +232,8 @@ with k3:
 
 st.markdown("---")
 
-# Camada de Geolocalização Integrada Nativa (Coordenadas Básicas do Amapá)
 st.subheader("🗺️ Mapeamento Espacial das Urnas e Clientes Mapeados")
 
-# Dicionário de geolocalização dos municípios do Amapá para plotagem
 geo_data = {
     'macapá': {'lat': -0.0349, 'lon': -51.0694},
     'santana': {'lat': -0.0583, 'lon': -51.1817},
@@ -292,14 +274,12 @@ else:
 
 if map_records:
     df_map = pd.DataFrame(map_records)
-    # Correção do parâmetro size para evitar erros JSON no DeckGL Chart
     st.map(df_map, latitude='latitude', longitude='longitude', size='votos')
 else:
     st.info("Coordenadas geográficas indisponíveis para o escopo atual.")
 
 st.markdown("---")
 
-# 6. Renderização Gráfica do Mapa de Manchas (HTML5 e CSS Inline Autônomo)
 st.subheader("🔥 Distribuição Geométrica Digital das Manchas de Calor")
 
 if teto_urnas > 0:
@@ -320,7 +300,7 @@ if teto_urnas > 0:
         <div style='width: 100%; background: rgba(220, 53, 69, 0.9); color: white; padding: 25px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 14px; text-transform: uppercase; font-weight: bold;'>&#9899; MANCHA 2: Urnas Mapeadas (Teto Base)</span>
             <h2 style='margin: 5px 0 0 0; color: white;'>{teto_urnas} Votos Computados</h2>
-            <p style='margin: 5px 0 0 0; font-size:13px; opacity:0.8;'>Marcio: {votos_marcio} | Liliane: {votos_liliane} | Acácio: {votos_acacio}</p>
+            <p style='margin: 5px 0 0 0; font-size:13px; opacity:0.8;'>Marcio: {votos_marcio} | Liliane: {votos_liliane}</p>
         </div>
         <div style='width: {w_cv}%; min-width: 200px; background: rgba(40, 167, 69, 0.9); color: white; padding: 18px; border-radius: 6px; font-family: sans-serif;'>
             <span style='font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;'>&#128994; MANCHA 3: Desempenho Convertidos</span>
@@ -335,11 +315,9 @@ else:
 
 st.markdown("---")
 
-# 7. Geração de Rankings por Atendentes (Geral e Proporcional)
 st.subheader("🏆 Ranking de Desempenho e Conversão por Atendente")
 
 if not df_da_f.empty:
-    # Agrupamento e cálculo de participações
     rank_df = df_da_f.groupby('atend_id')['votos'].sum().reset_index()
     rank_df.columns = ['Atendente', 'Votos Conquistados']
     rank_df['% Proporção sobre Urnas'] = (rank_df['Votos Conquistados'] / teto_urnas * 100).round(2) if teto_urnas > 0 else 0
@@ -347,7 +325,6 @@ if not df_da_f.empty:
 else:
     st.warning("Sem registros cadastrais sob os filtros selecionados.")
 
-# 8. FERRAMENTA DE BACKUP INTEGRADA
 st.sidebar.markdown("---")
 st.sidebar.subheader("💾 Backup do Código Fonte")
 with open(__file__, "r", encoding="utf-8") as f:
